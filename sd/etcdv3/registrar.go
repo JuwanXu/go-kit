@@ -11,12 +11,11 @@ const minHeartBeatTime = 500 * time.Millisecond
 
 // 服务注册结构体
 type Registrar struct {
-	client  Client
-	service Service
-	logger  log.Logger
-
-	quitmtx sync.Mutex
-	quit    chan struct{}
+	client  Client        // etcd客户端
+	service Service       // 服务信息
+	logger  log.Logger    // 日志
+	quitMtx sync.Mutex    // 退出锁
+	quit    chan struct{} // 退出chan
 }
 
 type Service struct {
@@ -43,6 +42,7 @@ func NewTTLOption(heartbeat, ttl time.Duration) *TTLOption {
 	}
 }
 
+// 生成一个服务注册结构体
 func NewRegistrar(client Client, service Service, logger log.Logger) *Registrar {
 	return &Registrar{
 		client:  client,
@@ -51,6 +51,7 @@ func NewRegistrar(client Client, service Service, logger log.Logger) *Registrar 
 	}
 }
 
+// 注册服务
 func (r *Registrar) Register() {
 	if err := r.client.Register(r.service); err != nil {
 		r.logger.Log("err", err)
@@ -63,14 +64,15 @@ func (r *Registrar) Register() {
 	}
 }
 
+// 取消注册服务
 func (r *Registrar) Deregister() {
 	if err := r.client.Deregister(r.service); err != nil {
 		r.logger.Log("err", err)
 	} else {
 		r.logger.Log("action", "deregister")
 	}
-	r.quitmtx.Lock()
-	defer r.quitmtx.Unlock()
+	r.quitMtx.Lock()
+	defer r.quitMtx.Unlock()
 	if r.quit != nil {
 		close(r.quit)
 		r.quit = nil
