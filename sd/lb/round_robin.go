@@ -7,7 +7,7 @@ import (
 	"github.com/go-kit/kit/sd"
 )
 
-// NewRoundRobin returns a load balancer that returns services in sequence.
+// 轮询返回一个可用的Endpoint
 func NewRoundRobin(s sd.Endpointer) Balancer {
 	return &roundRobin{
 		s: s,

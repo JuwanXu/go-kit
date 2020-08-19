@@ -7,7 +7,7 @@ import (
 	"github.com/go-kit/kit/sd"
 )
 
-// NewRandom returns a load balancer that selects services randomly.
+// 随机返回一个可用的Endpoint
 func NewRandom(s sd.Endpointer, seed int64) Balancer {
 	return &random{
 		s: s,

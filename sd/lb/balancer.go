@@ -6,7 +6,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
-// Balancer yields endpoints according to some heuristic.
+// 定义一个负载均衡接口
 type Balancer interface {
 	Endpoint() (endpoint.Endpoint, error)
 }
